@@ -497,7 +497,9 @@
         };
 
         const API = (CONFIG.photosApi || '').replace(/\/+$/, '');
-        const SINCE = (CONFIG.photosSince || '').replace(/\D/g, '');
+        // URL に ?preview=1 を付けると photosSince を無視して全部表示（動作確認用）
+        const PREVIEW = new URLSearchParams(location.search).get('preview') === '1';
+        const SINCE = PREVIEW ? '' : (CONFIG.photosSince || '').replace(/\D/g, '');
         const REFRESH_MS = 60000;
 
         const hero = document.getElementById('hero');
@@ -666,7 +668,9 @@
 
         function updateBar() {
             bar.hidden = pool.length === 0;
-            countEl.textContent = pool.length ? pool.length + ' PHOTOS' : '';
+            countEl.textContent = pool.length
+                ? pool.length + ' PHOTOS' + (PREVIEW ? ' ・ PREVIEW' : '')
+                : '';
             shuffleBtn.hidden = pool.length <= CONFIG.galleryCount;
         }
 
@@ -770,6 +774,14 @@
                 // 読み込めないときはプレースホルダーのまま（次の更新で再挑戦）
                 if (initial && !pool.length) placeholders();
             }
+        }
+
+        if (PREVIEW) {
+            const note = document.createElement('p');
+            note.className = 'thanks-message';
+            note.style.cssText = 'margin-top:18px;font-size:12px;letter-spacing:0.14em;color:var(--accent)';
+            note.textContent = '※ プレビュー表示中（式より前の写真も含めて表示しています）';
+            bar.insertAdjacentElement('afterend', note);
         }
 
         if (CONFIG.heroPhoto) {

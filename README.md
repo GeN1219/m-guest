@@ -36,6 +36,18 @@ gh workflow run deploy.yml --repo GeN1219/m-guest --ref main
 |---|---|
 | `photosApi` | 写真サイトのURL |
 | `photosSince` | **この日以降の写真だけ表示**。既定は `2026-11-15`。式より前のテスト投稿を出さないための設定 |
+
+### 動作確認（プレビュー）
+
+URL に `?preview=1` を付けると `photosSince` を無視して、今あるテスト写真も含めて表示します。
+
+```
+https://gen1219.github.io/m-guest/?preview=1
+```
+
+公開ページ（`?preview=1` なし）は従来どおり式当日以降の写真しか出しません。
+設定を書き換える必要がないので、戻し忘れの心配もありません。
+
 | `galleryCount` | 一度に並べる枚数（既定12） |
 | `heroPhoto` | ヒーローを手動で固定したいときだけ指定 |
 | `photos` | 手動で写真を指定したいときだけ。指定すると自動読み込みは使いません |
