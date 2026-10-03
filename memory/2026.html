@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 — G &amp; A</title>
+    <link rel="manifest" href="../manifest.json">
+    <meta name="theme-color" content="#faf8f4">
+    <link rel="icon" href="../icon-192.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="../icon-192.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-sw-path="../sw.js">
+
+    <header class="site-header">
+        <a class="brand" href="../index.html">G<span class="amp">&amp;</span>A</a>
+        <nav class="nav-links">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#story" class="is-current">History</a>
+            <a href="../days.html">Days</a>
+            <a href="https://wedding-photos.gensen4631.workers.dev" target="_blank" rel="noopener">Photo</a>
+            <a href="../baseball.html">Baseball</a>
+            <a href="../map.html">Map</a>
+        </nav>
+        <div class="days-chip"><span data-days></span>&nbsp;days</div>
+        <button class="nav-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <div class="nav-drawer">
+        <a href="../index.html">ホーム<small>HOME</small></a>
+        <a href="../index.html#story">History<small>MEMORIES</small></a>
+        <a href="../days.html">Days<small>DAYS</small></a>
+        <a href="https://wedding-photos.gensen4631.workers.dev" target="_blank" rel="noopener">写真<small>PHOTO</small></a>
+        <a href="../baseball.html">Baseball<small>BASEBALL</small></a>
+        <a href="../map.html">マップ<small>MAP</small></a>
+    </div>
+
+    <section class="page-hero">
+        <p class="eyebrow">To Our Wedding</p>
+        <div class="divider"></div>
+        <h1>2026</h1>
+        <p class="page-sub">結婚へ向かう一年</p>
+    </section>
+
+    <main class="timeline">
+
+        <!--
+            ▼ 思い出の追加テンプレート（この <section> ごとコピーして増やせます）
+            <section class="moment">
+                <p class="moment-date">2026.MM.DD<span class="moment-tag">英語のひとこと</span></p>
+                <h3>見出し</h3>
+                <p class="moment-body">本文。<br>改行は br で。</p>
+                <div class="photo-grid">
+                    <figure><img src="pic/2026/ファイル名.jpg" alt="説明" loading="lazy"></figure>
+                </div>
+            </section>
+        -->
+
+        <section class="moment">
+            <p class="moment-date">2026.02.20–22<span class="moment-tag">Okinawa</span></p>
+            <h3>沖縄！</h3>
+            <p class="moment-body">
+                二人で行く初めての沖縄！沖縄だけどほぼ野球のキャンプ！相変わらず野球主体。。笑<br>
+                彩乃に野球のキャンプの楽しさ伝えられてよかった！<br>
+                国際通りもアメリカンヴィレッジも想像以上に楽しめたね！<br>
+                また次もキャンプ、そして美ら海行きましょう！
+            </p>
+            <div class="photo-grid">
+                <figure><img src="pic/2026/okinawa_01.jpg" alt="沖縄 キャンプ球場" loading="lazy"></figure>
+                <figure><img src="pic/2026/okinawa_03.jpg" alt="沖縄 自撮り" loading="lazy"></figure>
+                <figure><img src="pic/2026/okinawa_02.jpg" alt="沖縄 ビーチ" loading="lazy"></figure>
+            </div>
+        </section>
+
+    </main>
+
+    <nav class="year-nav">
+        <a class="prev" href="2025.html">
+            <span class="dir">Prev</span>
+            <span class="label">← 2025</span>
+        </a>
+        <a class="next" href="../days.html">
+            <span class="dir">Next</span>
+            <span class="label">結婚してから — Days →</span>
+        </a>
+    </nav>
+
+    <footer class="site-footer">
+        <p class="brand">G<span class="amp">&amp;</span>A</p>
+        <p class="footer-since">SINCE 2017.11.15</p>
+        <p class="footer-days"><span data-days></span> days &amp; counting</p>
+    </footer>
+
+    <script src="../assets/js/site.js"></script>
+</body>
+</html>

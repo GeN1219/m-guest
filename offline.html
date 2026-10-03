@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>オフライン — G &amp; A</title>
+    <meta name="theme-color" content="#faf8f4">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+            background: #faf8f4;
+            color: #35302b;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 24px;
+        }
+        .box { max-width: 420px; }
+        .mark {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 42px;
+            letter-spacing: 0.2em;
+        }
+        .mark .amp { color: #b08d57; font-style: italic; }
+        .divider {
+            width: 56px; height: 1px; background: #b08d57;
+            margin: 26px auto;
+        }
+        h1 { font-size: 20px; font-weight: 600; letter-spacing: 0.2em; }
+        p { margin-top: 16px; color: #857b70; font-size: 14px; line-height: 2; letter-spacing: 0.06em; }
+        a {
+            display: inline-block;
+            margin-top: 28px;
+            padding: 12px 34px;
+            border: 1px solid #b08d57;
+            border-radius: 999px;
+            color: #b08d57;
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 0.2em;
+            transition: all 0.3s ease;
+        }
+        a:hover { background: #b08d57; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <p class="mark">G<span class="amp">&amp;</span>A</p>
+        <div class="divider"></div>
+        <h1>オフラインです</h1>
+        <p>インターネットに接続されていません。<br>接続を確認して、もう一度お試しください。</p>
+        <a href="./">再読み込み</a>
+    </div>
+</body>
+</html>

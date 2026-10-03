@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Days — G &amp; A</title>
+    <meta name="description" content="結婚してからの、ふたりの日々">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#faf8f4">
+    <link rel="icon" href="icon-192.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon-192.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* ---- Days（結婚後）の章扉 ---- */
+        .days-intro {
+            max-width: 640px;
+            margin: 0 auto 90px;
+            padding: 0 24px 50px;
+            text-align: center;
+        }
+
+        .days-intro .mark-date {
+            font-family: var(--font-latin);
+            font-size: clamp(30px, 6vw, 46px);
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+        }
+
+        .days-intro .lead {
+            margin-top: 20px;
+            font-size: 15px;
+            line-height: 2.6;
+            letter-spacing: 0.1em;
+            color: var(--ink-soft);
+        }
+    </style>
+</head>
+<body data-sw-path="sw.js">
+
+    <header class="site-header">
+        <a class="brand" href="index.html">G<span class="amp">&amp;</span>A</a>
+        <nav class="nav-links">
+            <a href="index.html">ホーム</a>
+            <a href="index.html#story">History</a>
+            <a href="days.html" class="is-current">Days</a>
+            <a href="https://wedding-photos.gensen4631.workers.dev" target="_blank" rel="noopener">Photo</a>
+            <a href="baseball.html">Baseball</a>
+            <a href="map.html">Map</a>
+        </nav>
+        <div class="days-chip"><span data-days></span>&nbsp;days</div>
+        <button class="nav-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <div class="nav-drawer">
+        <a href="index.html">ホーム<small>HOME</small></a>
+        <a href="index.html#story">History<small>MEMORIES</small></a>
+        <a href="days.html">Days<small>DAYS</small></a>
+        <a href="https://wedding-photos.gensen4631.workers.dev" target="_blank" rel="noopener">写真<small>PHOTO</small></a>
+        <a href="baseball.html">Baseball<small>BASEBALL</small></a>
+        <a href="map.html">マップ<small>MAP</small></a>
+    </div>
+
+    <section class="page-hero">
+        <p class="eyebrow">After the Wedding</p>
+        <div class="divider"></div>
+        <h1>Days</h1>
+        <p class="page-sub">夫婦になってからの、ふたりの日々</p>
+    </section>
+
+    <main class="story" id="days">
+
+        <div class="days-intro reveal">
+            <p class="mark-date">2026.5.15</p>
+            <p class="lead">
+                この日、ふたりは夫婦になりました。<br>
+                ここから、夫婦としての日々がはじまります。<br>
+                写真をひらくと、その年のページへ。
+            </p>
+        </div>
+
+        <!--
+            ▼ 年の追加テンプレート（days/YYYY.html を作って、この <article> ごとコピー）
+            <article class="chapter">
+                <a class="chapter-photo" href="days/YYYY.html">
+                    <div class="frame"><img src="days/pic/YYYY/ファイル名.jpg" alt="YYYY年の日々" loading="lazy"></div>
+                </a>
+                <div class="chapter-text">
+                    <p class="chapter-year">YYYY</p>
+                    <p class="chapter-label">英語のひとこと</p>
+                    <p class="chapter-desc">その年の紹介文。</p>
+                    <a class="chapter-link" href="days/YYYY.html">VIEW DAYS<span class="arrow"></span></a>
+                </div>
+            </article>
+        -->
+
+        <article class="chapter">
+            <a class="chapter-photo" href="days/2026.html">
+                <div class="frame"><img src="days/pic/2026/fitting_futari.jpg" alt="2026年の日々" loading="lazy"></div>
+            </a>
+            <div class="chapter-text">
+                <p class="chapter-year">2026</p>
+                <p class="chapter-label">Just Married</p>
+                <p class="chapter-desc">5月15日、ふたりは夫婦になりました。和装の衣装合わせ、そして結婚式へ。</p>
+                <a class="chapter-link" href="days/2026.html">VIEW DAYS<span class="arrow"></span></a>
+            </div>
+        </article>
+
+    </main>
+
+    <nav class="year-nav">
+        <a class="prev" href="memory/2026.html">
+            <span class="dir">Prev</span>
+            <span class="label">← 結婚まで 2026</span>
+        </a>
+        <a class="next is-empty" href="#" aria-hidden="true"></a>
+    </nav>
+
+    <footer class="site-footer">
+        <p class="brand">G<span class="amp">&amp;</span>A</p>
+        <p class="footer-since">SINCE 2017.11.15</p>
+        <p class="footer-days"><span data-days></span> days &amp; counting</p>
+    </footer>
+
+    <script src="assets/js/site.js"></script>
+</body>
+</html>

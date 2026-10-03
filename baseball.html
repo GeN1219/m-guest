@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baseball — G &amp; A</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#faf8f4">
+    <link rel="icon" href="icon-192.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon-192.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* ---- このページ専用スタイル ---- */
+
+        /* 12球場制覇トラッカー */
+        .stadium-section {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 10px 24px 30px;
+        }
+
+        .stadium-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .stadium-head h2 {
+            font-size: clamp(19px, 3vw, 23px);
+            font-weight: 600;
+            letter-spacing: 0.18em;
+        }
+
+        .complete-badge {
+            font-family: var(--font-latin);
+            font-size: 12px;
+            letter-spacing: 0.26em;
+            color: var(--accent);
+            border: 1px solid var(--accent-soft);
+            border-radius: 999px;
+            padding: 5px 16px;
+            white-space: nowrap;
+        }
+
+        .league-label {
+            font-family: var(--font-latin);
+            font-size: 11.5px;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin: 22px 2px 10px;
+        }
+
+        .stadium-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 10px;
+        }
+
+        .stadium-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 13px 16px;
+        }
+
+        .stadium-check {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+        }
+
+        .stadium-name {
+            font-size: 13.5px;
+            letter-spacing: 0.04em;
+            line-height: 1.5;
+        }
+
+        .stadium-team {
+            display: block;
+            font-family: var(--font-latin);
+            font-size: 10.5px;
+            letter-spacing: 0.18em;
+            color: var(--ink-faint);
+            margin-top: 2px;
+        }
+
+        /* 記録のある球場は観戦記録の絞り込みボタンになる */
+        .stadium-card.has-records {
+            cursor: pointer;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease,
+                        background 0.25s ease, transform 0.25s ease;
+        }
+
+        .stadium-card.has-records:hover {
+            border-color: var(--accent-soft);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-2px);
+        }
+
+        .stadium-card.has-records:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .stadium-card.is-selected {
+            border-color: var(--accent);
+            background: var(--accent-faint);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stadium-count {
+            margin-left: auto;
+            align-self: center;
+            font-family: var(--font-latin);
+            font-size: 10.5px;
+            letter-spacing: 0.14em;
+            color: var(--accent);
+            border: 1px solid var(--accent-soft);
+            border-radius: 999px;
+            padding: 2px 9px;
+            white-space: nowrap;
+        }
+
+        /* 絞り込み中の表示 */
+        .stadium-filter-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin: 0 0 26px;
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            color: var(--ink-soft);
+        }
+
+        .stadium-filter-status[hidden] {
+            display: none;
+        }
+
+        .stadium-filter-status .label strong {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .stadium-filter-clear {
+            font-family: var(--font-latin);
+            font-size: 11.5px;
+            letter-spacing: 0.18em;
+            color: var(--accent);
+            border: 1px solid var(--accent-soft);
+            border-radius: 999px;
+            padding: 5px 14px;
+            background: transparent;
+            cursor: pointer;
+            transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+        }
+
+        .stadium-filter-clear:hover {
+            color: #fff;
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .games-empty {
+            text-align: center;
+            color: var(--ink-faint);
+            font-size: 14px;
+            letter-spacing: 0.06em;
+            padding: 30px 0;
+        }
+
+        /* 観戦記録 */
+        .games-section {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 40px 24px 90px;
+        }
+
+        .games-head {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+
+        .games-head h2 {
+            font-size: clamp(19px, 3vw, 23px);
+            font-weight: 600;
+            letter-spacing: 0.18em;
+        }
+
+        .game-card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+            margin-bottom: 22px;
+        }
+
+        .game-photo {
+            margin: 0;
+            overflow: hidden;
+            cursor: zoom-in;
+            min-height: 220px;
+        }
+
+        .game-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .game-photo:hover img {
+            transform: scale(1.05);
+        }
+
+        .game-body {
+            padding: 26px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            justify-content: center;
+        }
+
+        .game-date {
+            font-family: var(--font-latin);
+            font-size: 14px;
+            letter-spacing: 0.22em;
+            color: var(--accent);
+        }
+
+        .game-date .game-tag {
+            font-size: 11px;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-left: 12px;
+        }
+
+        .scoreboard {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 8px;
+            border-top: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+            padding: 14px 4px;
+        }
+
+        .sb-team {
+            text-align: center;
+        }
+
+        .sb-team .name {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+        }
+
+        .sb-team .score {
+            font-family: var(--font-latin);
+            font-size: 34px;
+            font-weight: 500;
+            line-height: 1.2;
+            color: var(--ink-faint);
+        }
+
+        .sb-team.winner .score {
+            color: var(--accent);
+        }
+
+        .sb-team .win-mark {
+            display: block;
+            font-family: var(--font-latin);
+            font-size: 10px;
+            letter-spacing: 0.3em;
+            color: var(--accent);
+            height: 14px;
+        }
+
+        .sb-vs {
+            font-family: var(--font-latin);
+            font-style: italic;
+            color: var(--ink-faint);
+            font-size: 14px;
+            padding: 0 6px;
+        }
+
+        .scoreboard.no-score {
+            display: block;
+            text-align: center;
+        }
+
+        .scoreboard.no-score .name {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+        }
+
+        .game-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 13px;
+            color: var(--ink-soft);
+            letter-spacing: 0.08em;
+        }
+
+        .game-note {
+            font-size: 13.5px;
+            color: var(--ink-soft);
+            letter-spacing: 0.05em;
+        }
+
+        .npb-link {
+            font-family: var(--font-latin);
+            font-size: 11.5px;
+            letter-spacing: 0.2em;
+            color: var(--accent);
+            border-bottom: 1px solid var(--accent-soft);
+            padding-bottom: 2px;
+            transition: color 0.25s ease, border-color 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .npb-link:hover {
+            color: var(--ink);
+            border-color: var(--ink);
+        }
+
+        @media (max-width: 680px) {
+            .game-card {
+                grid-template-columns: 1fr;
+            }
+
+            .game-photo {
+                aspect-ratio: 16 / 10;
+                min-height: 0;
+            }
+
+            .game-body {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body data-sw-path="sw.js">
+
+    <header class="site-header">
+        <a class="brand" href="index.html">G<span class="amp">&amp;</span>A</a>
+        <nav class="nav-links">
+            <a href="index.html">ホーム</a>
+            <a href="index.html#story">History</a>
+            <a href="days.html">Days</a>
+            <a href="https://wedding-photos.gensen4631.workers.dev" target="_blank" rel="noopener">Photo</a>
+            <a href="baseball.html" class="is-current">Baseball</a>
+            <a href="map.html">Map</a>
+        </nav>
+        <div class="days-chip"><span data-days></span>&nbsp;days</div>
+        <button class="nav-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <div class="nav-drawer">
+        <a href="index.html">ホーム<small>HOME</small></a>
+        <a href="index.html#story">History<small>MEMORIES</small></a>
+        <a href="days.html">Days<small>DAYS</small></a>
+        <a href="https://wedding-photos.gensen4631.workers.dev" target="_blank" rel="noopener">写真<small>PHOTO</small></a>
+        <a href="baseball.html">Baseball<small>BASEBALL</small></a>
+        <a href="map.html">マップ<small>MAP</small></a>
+    </div>
+
+    <section class="page-hero">
+        <p class="eyebrow">Play Ball</p>
+        <div class="divider"></div>
+        <h1>Baseball</h1>
+        <p class="page-sub">ふたりの野球観戦の記録</p>
+    </section>
+
+    <!-- 12球場制覇 -->
+    <section class="stadium-section reveal">
+        <div class="stadium-head">
+            <h2>NPB 12球場制覇</h2>
+            <span class="complete-badge">12 / 12 — COMPLETE 2025.08</span>
+        </div>
+
+        <p class="league-label">Central League</p>
+        <div class="stadium-grid">
+            <div class="stadium-card" data-stadium="バンテリンドーム ナゴヤ"><span class="stadium-check">✓</span><span class="stadium-name">バンテリンドーム ナゴヤ<span class="stadium-team">CHUNICHI DRAGONS</span></span></div>
+            <div class="stadium-card" data-stadium="東京ドーム"><span class="stadium-check">✓</span><span class="stadium-name">東京ドーム<span class="stadium-team">YOMIURI GIANTS</span></span></div>
+            <div class="stadium-card" data-stadium="阪神甲子園球場"><span class="stadium-check">✓</span><span class="stadium-name">阪神甲子園球場<span class="stadium-team">HANSHIN TIGERS</span></span></div>
+            <div class="stadium-card" data-stadium="マツダスタジアム"><span class="stadium-check">✓</span><span class="stadium-name">マツダスタジアム<span class="stadium-team">HIROSHIMA CARP</span></span></div>
+            <div class="stadium-card" data-stadium="横浜スタジアム"><span class="stadium-check">✓</span><span class="stadium-name">横浜スタジアム<span class="stadium-team">YOKOHAMA DeNA BAYSTARS</span></span></div>
+            <div class="stadium-card" data-stadium="明治神宮野球場"><span class="stadium-check">✓</span><span class="stadium-name">明治神宮野球場<span class="stadium-team">YAKULT SWALLOWS</span></span></div>
+        </div>
+
+        <p class="league-label">Pacific League</p>
+        <div class="stadium-grid">
+            <div class="stadium-card" data-stadium="エスコンフィールドHOKKAIDO"><span class="stadium-check">✓</span><span class="stadium-name">エスコンフィールドHOKKAIDO<span class="stadium-team">HOKKAIDO NIPPON-HAM FIGHTERS</span></span></div>
+            <div class="stadium-card" data-stadium="楽天モバイルパーク宮城"><span class="stadium-check">✓</span><span class="stadium-name">楽天モバイルパーク宮城<span class="stadium-team">RAKUTEN EAGLES</span></span></div>
+            <div class="stadium-card" data-stadium="ベルーナドーム"><span class="stadium-check">✓</span><span class="stadium-name">ベルーナドーム<span class="stadium-team">SAITAMA SEIBU LIONS</span></span></div>
+            <div class="stadium-card" data-stadium="ZOZOマリンスタジアム"><span class="stadium-check">✓</span><span class="stadium-name">ZOZOマリンスタジアム<span class="stadium-team">CHIBA LOTTE MARINES</span></span></div>
+            <div class="stadium-card" data-stadium="京セラドーム大阪"><span class="stadium-check">✓</span><span class="stadium-name">京セラドーム大阪<span class="stadium-team">ORIX BUFFALOES</span></span></div>
+            <div class="stadium-card" data-stadium="みずほPayPayドーム福岡"><span class="stadium-check">✓</span><span class="stadium-name">みずほPayPayドーム福岡<span class="stadium-team">FUKUOKA SOFTBANK HAWKS</span></span></div>
+        </div>
+    </section>
+
+    <!-- 観戦記録 -->
+    <section class="games-section">
+        <div class="games-head reveal">
+            <p class="eyebrow">Game Records</p>
+            <h2>観戦記録</h2>
+        </div>
+
+        <div class="chip-row" id="yearFilter" style="justify-content:center"></div>
+        <div class="stadium-filter-status" id="stadiumFilterStatus" hidden></div>
+
+        <article class="game-card reveal record" data-year="2019" data-stadium="バンテリンドーム ナゴヤ">
+            <figure class="game-photo"><img src="pic/baseball/bh01.JPG" alt="2019.08.21 ナゴヤドーム" loading="lazy"></figure>
+            <div class="game-body">
+                <p class="game-date">2019.08.21<span class="game-tag">NPB</span></p>
+                <div class="scoreboard">
+                    <div class="sb-team"><span class="win-mark"></span><p class="name">中日</p><p class="score">2</p></div>
+                    <span class="sb-vs">vs</span>
+                    <div class="sb-team winner"><span class="win-mark">WIN</span><p class="name">巨人</p><p class="score">5</p></div>
+                </div>
+                <div class="game-meta">
+                    <span>＠ナゴヤドーム</span>
+                    <a class="npb-link" href="https://npb.jp/bis/2019/games/s2019082101705.html" target="_blank" rel="noopener">NPB 公式記録 ↗</a>
+                </div>
+                <p class="game-note">巨人の勝利!!!!</p>
+            </div>
+        </article>
+
+        <article class="game-card reveal record" data-year="2022" data-stadium="バンテリンドーム ナゴヤ">
+            <figure class="game-photo"><img src="pic/baseball/bh02.jpg" alt="2022.04.24 バンテリンドーム" loading="lazy"></figure>
+            <div class="game-body">
+                <p class="game-date">2022.04.24<span class="game-tag">NPB</span></p>
+                <div class="scoreboard">
+                    <div class="sb-team winner"><span class="win-mark">WIN</span><p class="name">中日</p><p class="score">7</p></div>
+                    <span class="sb-vs">vs</span>
+                    <div class="sb-team"><span class="win-mark"></span><p class="name">巨人</p><p class="score">6</p></div>
+                </div>
+                <div class="game-meta">
+                    <span>＠バンテリンドーム ナゴヤ</span>
+                    <a class="npb-link" href="https://npb.jp/bis/2022/games/s2022042400111.html" target="_blank" rel="noopener">NPB 公式記録 ↗</a>
+                </div>
+                <p class="game-note">中日の勝利</p>
+            </div>
+        </article>
+
+        <article class="game-card reveal record" data-year="2022" data-stadium="マツダスタジアム">
+            <figure class="game-photo"><img src="pic/baseball/bh03.jpg" alt="2022.07.29 マツダスタジアム" loading="lazy"></figure>
+            <div class="game-body">
+                <p class="game-date">2022.07.29<span class="game-tag">NPB</span></p>
+                <div class="scoreboard">
+                    <div class="sb-team"><span class="win-mark"></span><p class="name">広島</p><p class="score">0</p></div>
+                    <span class="sb-vs">vs</span>
+                    <div class="sb-team winner"><span class="win-mark">WIN</span><p class="name">中日</p><p class="score">9</p></div>
+                </div>
+                <div class="game-meta">
+                    <span>＠マツダスタジアム</span>
+                    <a class="npb-link" href="https://npb.jp/bis/2022/games/s2022072900200.html" target="_blank" rel="noopener">NPB 公式記録 ↗</a>
+                </div>
+                <p class="game-note">中日の勝利</p>
+            </div>
+        </article>
+
+        <article class="game-card reveal record" data-year="2023" data-stadium="阪神甲子園球場">
+            <figure class="game-photo"><img src="pic/baseball/bh04.jpg" alt="2023.03.22 甲子園" loading="lazy"></figure>
+            <div class="game-body">
+                <p class="game-date">2023.03.22<span class="game-tag">High School</span></p>
+                <div class="scoreboard no-score">
+                    <p class="name">春のセンバツ高校野球</p>
+                </div>
+                <div class="game-meta">
+                    <span>＠阪神甲子園球場</span>
+                </div>
+                <p class="game-note">彩乃、初めての甲子園！</p>
+            </div>
+        </article>
+
+        <article class="game-card reveal record" data-year="2023" data-stadium="明治神宮野球場">
+            <figure class="game-photo"><img src="pic/baseball/20230617.jpg" alt="2023.06.17 明治神宮野球場" loading="lazy"></figure>
+            <div class="game-body">
+                <p class="game-date">2023.06.17<span class="game-tag">NPB</span></p>
+                <div class="scoreboard">
+                    <div class="sb-team"><span class="win-mark"></span><p class="name">ヤクルト</p><p class="score">5</p></div>
+                    <span class="sb-vs">vs</span>
+                    <div class="sb-team winner"><span class="win-mark">WIN</span><p class="name">オリックス</p><p class="score">8</p></div>
+                </div>
+                <div class="game-meta">
+                    <span>＠明治神宮野球場</span>
+                    <a class="npb-link" href="https://npb.jp/scores/2023/0617/s-b-02/" target="_blank" rel="noopener">NPB 公式記録 ↗</a>
+                </div>
+                <p class="game-note">交流戦。オリックスの勝利</p>
+            </div>
+        </article>
+
+        <article class="game-card reveal record" data-year="2023" data-stadium="東京ドーム">
+            <figure class="game-photo"><img src="pic/baseball/20230618.jpg" alt="2023.06.18 東京ドーム" loading="lazy"></figure>
+            <div class="game-body">
+                <p class="game-date">2023.06.18<span class="game-tag">NPB</span></p>
+                <div class="scoreboard">
+                    <div class="sb-team"><span class="win-mark"></span><p class="name">巨人</p><p class="score">1</p></div>
+                    <span class="sb-vs">vs</span>
+                    <div class="sb-team winner"><span class="win-mark">WIN</span><p class="name">楽天</p><p class="score">2</p></div>
+                </div>
+                <div class="game-meta">
+                    <span>＠東京ドーム</span>
+                    <a class="npb-link" href="https://npb.jp/scores/2023/0618/g-e-03/" target="_blank" rel="noopener">NPB 公式記録 ↗</a>
+                </div>
+                <p class="game-note">交流戦。楽天の勝利</p>
+            </div>
+        </article>
+
+        <article class="game-card reveal record" data-year="2023" data-stadium="バンテリンドーム ナゴヤ">
+            <figure class="game-photo"><img src="pic/baseball/20230827.jpg" alt="2023.08.27 バンテリンドーム" loading="lazy"></figure>
+            <div class="game-body">
+                <p class="game-date">2023.08.27<span class="game-tag">NPB</span></p>
+                <div class="scoreboard">
+                    <div class="sb-team winner"><span class="win-mark">WIN</span><p class="name">中日</p><p class="score">2</p></div>
+                    <span class="sb-vs">vs</span>
+                    <div class="sb-team"><span class="win-mark"></span><p class="name">DeNA</p><p class="score">1</p></div>
+                </div>
+                <div class="game-meta">
+                    <span>＠バンテリンドーム ナゴヤ</span>
+                    <a class="npb-link" href="https://npb.jp/scores/2023/0827/d-db-20/" target="_blank" rel="noopener">NPB 公式記録 ↗</a>
+                </div>
+                <p class="game-note">延長12回、中日のサヨナラ勝ち！</p>
+            </div>
+        </article>
+
+        <p class="games-empty" id="gamesEmpty" hidden>この球場の観戦記録はまだありません</p>
+    </section>
+
+    <footer class="site-footer">
+        <p class="brand">G<span class="amp">&amp;</span>A</p>
+        <p class="footer-since">SINCE 2017.11.15</p>
+        <p class="footer-days"><span data-days></span> days &amp; counting</p>
+    </footer>
+
+    <script src="assets/js/site.js"></script>
+    <script>
+        // 年フィルター（data-year）＋ 球場フィルター（data-stadium）
+        (() => {
+            const records = Array.from(document.querySelectorAll('.record'));
+            const yearBar = document.getElementById('yearFilter');
+            const statusBar = document.getElementById('stadiumFilterStatus');
+            const emptyEl = document.getElementById('gamesEmpty');
+            const stadiumCards = Array.from(document.querySelectorAll('.stadium-card'));
+            const gamesHead = document.querySelector('.games-section .games-head');
+
+            let activeYear = 'all';
+            let activeStadium = 'all';
+
+            // 球場ごとの観戦記録数を集計
+            const counts = {};
+            records.forEach(r => {
+                const s = r.dataset.stadium;
+                if (s) counts[s] = (counts[s] || 0) + 1;
+            });
+
+            const resetYearChips = () => {
+                yearBar.querySelectorAll('.chip').forEach(c =>
+                    c.classList.toggle('active', c.dataset.year === 'all'));
+            };
+
+            const renderStatus = () => {
+                if (activeStadium === 'all') {
+                    statusBar.hidden = true;
+                    statusBar.innerHTML = '';
+                    return;
+                }
+                statusBar.hidden = false;
+                statusBar.innerHTML = '';
+                const label = document.createElement('span');
+                label.className = 'label';
+                label.innerHTML = `<strong>${activeStadium}</strong> の記録`;
+                const clear = document.createElement('button');
+                clear.type = 'button';
+                clear.className = 'stadium-filter-clear';
+                clear.textContent = 'すべて表示';
+                clear.addEventListener('click', () => selectStadium('all', false));
+                statusBar.append(label, clear);
+            };
+
+            const apply = () => {
+                records.forEach(r => {
+                    const okYear = activeYear === 'all' || r.dataset.year === activeYear;
+                    const okStadium = activeStadium === 'all' || r.dataset.stadium === activeStadium;
+                    r.style.display = (okYear && okStadium) ? '' : 'none';
+                });
+                if (emptyEl) emptyEl.hidden = records.some(r => r.style.display !== 'none');
+                stadiumCards.forEach(c =>
+                    c.classList.toggle('is-selected', c.dataset.stadium === activeStadium));
+                renderStatus();
+            };
+
+            // ---- 年フィルター ----
+            const years = [...new Set(records.map(r => r.dataset.year))].sort();
+            const makeYearBtn = (label, value) => {
+                const btn = document.createElement('button');
+                btn.className = 'chip';
+                btn.dataset.year = value;
+                btn.textContent = label;
+                btn.addEventListener('click', () => {
+                    activeYear = value;
+                    activeStadium = 'all';   // 年を選んだら球場の絞り込みは解除
+                    yearBar.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === btn));
+                    apply();
+                });
+                yearBar.appendChild(btn);
+                return btn;
+            };
+            makeYearBtn('すべて', 'all').classList.add('active');
+            years.forEach(y => makeYearBtn(`${y}年`, y));
+
+            // ---- 球場フィルター ----
+            const selectStadium = (key, scroll) => {
+                activeStadium = (activeStadium === key) ? 'all' : key;   // 同じ球場を再度押すと解除
+                activeYear = 'all';
+                resetYearChips();
+                apply();
+                if (scroll && activeStadium !== 'all' && gamesHead) {
+                    gamesHead.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            };
+
+            stadiumCards.forEach(card => {
+                const key = card.dataset.stadium;
+                const n = counts[key] || 0;
+                if (n === 0) return;   // 観戦記録のある球場だけをボタン化
+                card.classList.add('has-records');
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('aria-label', `${key} の観戦記録 ${n}件を表示`);
+                const badge = document.createElement('span');
+                badge.className = 'stadium-count';
+                badge.textContent = `${n}試合`;
+                card.appendChild(badge);
+                card.addEventListener('click', () => selectStadium(key, true));
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectStadium(key, true); }
+                });
+            });
+
+            apply();
+        })();
+
+        // 写真クリックでライトボックス（site.js は .photo-grid 対象のため、このページ独自に簡易対応）
+        (() => {
+            const photos = Array.from(document.querySelectorAll('.game-photo img'));
+            photos.forEach(img => {
+                img.parentElement.addEventListener('click', () => {
+                    const box = document.createElement('div');
+                    box.className = 'lightbox is-open';
+                    box.innerHTML = '<button class="lightbox-btn lightbox-close" aria-label="閉じる">&times;</button><img src="' + img.src + '" alt="">';
+                    document.body.appendChild(box);
+                    document.body.style.overflow = 'hidden';
+                    const close = () => { box.remove(); document.body.style.overflow = ''; };
+                    box.addEventListener('click', (e) => { if (e.target !== box.querySelector('img')) close(); });
+                    document.addEventListener('keydown', function esc(e) {
+                        if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+                    });
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
