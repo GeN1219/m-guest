@@ -181,6 +181,158 @@
             }
         }
 
+        /* ヒーロー背景のクロスフェード */
+        .thanks-hero .bg .layer {
+            position: absolute;
+            inset: 0;
+            background-position: center 35%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 1.8s ease;
+        }
+
+        .thanks-hero .bg .layer.is-on {
+            opacity: 1;
+        }
+
+        /* アップロードされた写真のギャラリー */
+        .gallery-bar {
+            margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .gallery-bar[hidden] {
+            display: none;
+        }
+
+        .gallery-count {
+            font-family: var(--font-latin);
+            font-size: 12px;
+            letter-spacing: 0.24em;
+            color: var(--ink-faint);
+        }
+
+        .gallery-btn {
+            font-family: inherit;
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            color: var(--accent);
+            background: transparent;
+            border: 1px solid var(--accent-soft);
+            border-radius: 999px;
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: background 0.25s ease, color 0.25s ease;
+        }
+
+        .gallery-btn:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .gallery-btn[hidden] {
+            display: none;
+        }
+
+        .live-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 34px;
+        }
+
+        .live-tile {
+            position: relative;
+            aspect-ratio: 4 / 3;
+            border-radius: 6px;
+            overflow: hidden;
+            background: var(--card);
+            border: 1px solid var(--line);
+            cursor: pointer;
+        }
+
+        .live-tile.is-video {
+            background: linear-gradient(160deg, #3b352e, #211d18);
+        }
+
+        .live-tile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .live-tile img.is-loaded {
+            opacity: 1;
+        }
+
+        .live-tile:hover img {
+            transform: scale(1.05);
+        }
+
+        .live-tile .mark {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+
+        .live-tile .by {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 22px 10px 9px;
+            font-size: 10.5px;
+            letter-spacing: 0.14em;
+            color: #fff;
+            background: linear-gradient(transparent, rgba(20, 16, 12, 0.62));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .live-tile:hover .by {
+            opacity: 1;
+        }
+
+        .lightbox video {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 2px;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+        }
+
+        .lightbox-by {
+            position: absolute;
+            bottom: 52px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 12px;
+            letter-spacing: 0.16em;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 620px) {
+            .live-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+        }
+
         /* 写真共有のお願い（URL設定時のみ表示） */
         .share-card {
             margin-top: 40px;
@@ -290,6 +442,11 @@
         <p class="eyebrow">Gallery</p>
         <div class="divider"></div>
         <h2>あの日の写真</h2>
+        <div class="gallery-bar" id="galleryBar" hidden>
+            <span class="gallery-count" id="galleryCount"></span>
+            <button class="gallery-btn" id="shuffleBtn" hidden>シャッフル</button>
+            <button class="gallery-btn" id="newBtn" hidden></button>
+        </div>
         <div id="galleryArea"></div>
     </section>
 
@@ -322,63 +479,316 @@
     <script>
         // =====================================================
         // ありがとうサイト設定
-        // 結婚式の写真が用意できたらここを埋めるだけで反映されます
+        // 写真サイトにアップロードされた写真を自動で読み込んで表示します
         // =====================================================
         const CONFIG = {
-            // ヒーロー背景写真（例: 'pic/wedding/hero.jpg'）。null なら上品なグラデーション表示
+            // 写真アップロードサイト（ここにアップされた写真を表示）
+            photosApi: 'https://wedding-photos.gensen4631.workers.dev',
+            // この日以降にアップロードされた写真だけを表示する
+            // （式より前のテスト投稿を載せないための設定。'' にすると全部表示）
+            photosSince: '2026-11-15',
+            // 一度に並べる枚数。毎回この中からランダムに選ばれます
+            galleryCount: 12,
+            // 手動で写真を指定したいときだけ使用（指定すると自動読み込みより優先）
             heroPhoto: null,
-            // ギャラリー写真のパスを追加（例: 'pic/wedding/001.jpg'）。空ならプレースホルダー表示
-            photos: [
-                // 'pic/wedding/001.jpg',
-                // 'pic/wedding/002.jpg',
-            ],
-            // 皆様からの写真共有URL（Googleフォト共有アルバム等）。null なら共有セクション非表示
+            photos: [],
+            // 「写真をアップロードする」ボタンのリンク先
             shareUrl: 'https://wedding-photos.gensen4631.workers.dev',
         };
 
-        // ---- ヒーロー写真 ----
-        if (CONFIG.heroPhoto) {
-            document.getElementById('heroBg').style.backgroundImage = `url('${CONFIG.heroPhoto}')`;
-            document.getElementById('hero').classList.add('has-photo');
-            document.body.classList.add('hero-photo');
+        const API = (CONFIG.photosApi || '').replace(/\/+$/, '');
+        const SINCE = (CONFIG.photosSince || '').replace(/\D/g, '');
+        const REFRESH_MS = 60000;
+
+        const hero = document.getElementById('hero');
+        const heroBg = document.getElementById('heroBg');
+        const area = document.getElementById('galleryArea');
+        const bar = document.getElementById('galleryBar');
+        const countEl = document.getElementById('galleryCount');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const newBtn = document.getElementById('newBtn');
+
+        let pool = [];   // 表示できる写真すべて
+        let shown = 0;   // 最後に並べ替えたときの枚数（新着判定用）
+
+        function shuffle(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
         }
 
-        // ---- ギャラリー ----
-        (() => {
-            const area = document.getElementById('galleryArea');
-            if (CONFIG.photos.length === 0) {
-                // 写真が来るまでのプレースホルダー
-                const grid = document.createElement('div');
-                grid.className = 'placeholder-grid';
-                for (let i = 0; i < 6; i++) {
-                    const tile = document.createElement('div');
-                    tile.className = 'placeholder-tile';
-                    tile.innerHTML = '<span class="cam">📷</span><span class="txt">Coming Soon</span>';
-                    grid.appendChild(tile);
+        const photoUrl = (key, thumb) =>
+            API + '/api/photo/' + encodeURIComponent(key) + (thumb ? '?size=thumb' : '');
+
+        // キーの形式は photos/YYYYMMDD-HHmmss-xxxxxxxx.ext
+        const keyDate = (key) => key.slice(7, 15);
+
+        function fromApi(list) {
+            return list
+                .filter((p) => /^photos\/\d{8}-/.test(p.key))
+                .filter((p) => !SINCE || keyDate(p.key) >= SINCE)
+                .map((p) => ({
+                    full: photoUrl(p.key, false),
+                    // サムネイルがあれば一覧はそちらを使う（原寸は数MBあるため）
+                    thumb: p.hasThumb ? photoUrl(p.key, true) : photoUrl(p.key, false),
+                    name: (p.uploaderName || '').trim(),
+                    isVideo: (p.contentType || '').startsWith('video/'),
+                }));
+        }
+
+        const fromConfig = () =>
+            CONFIG.photos.map((src) => ({ full: src, thumb: src, name: '', isVideo: false }));
+
+        // ------------------------------------------------------
+        // ヒーロー背景（複数あるときは8秒ごとにゆっくり切り替え）
+        // ------------------------------------------------------
+        const layers = [];
+        let heroTimer = null;
+
+        function showHero(list) {
+            if (!list.length) return;
+            if (!layers.length) {
+                for (let i = 0; i < 2; i++) {
+                    const l = document.createElement('div');
+                    l.className = 'layer';
+                    heroBg.appendChild(l);
+                    layers.push(l);
                 }
-                area.appendChild(grid);
-                const note = document.createElement('p');
-                note.className = 'thanks-message';
-                note.style.marginTop = '26px';
-                note.textContent = '当日の写真は、準備ができ次第こちらに掲載します';
-                area.appendChild(note);
-            } else {
-                // 写真ギャラリー（site.js のライトボックスが有効になります）
-                const grid = document.createElement('div');
-                grid.className = 'photo-grid';
-                grid.style.marginTop = '40px';
-                CONFIG.photos.forEach((src) => {
-                    const fig = document.createElement('figure');
-                    const img = document.createElement('img');
-                    img.src = src;
-                    img.alt = '結婚式の写真';
-                    img.loading = 'lazy';
-                    fig.appendChild(img);
-                    grid.appendChild(fig);
-                });
-                area.appendChild(grid);
             }
-        })();
+            hero.classList.add('has-photo');
+            document.body.classList.add('hero-photo');
+
+            let i = 0;
+            let active = 0;
+            const swap = () => {
+                const url = list[i % list.length].full;
+                i++;
+                const pre = new Image();
+                pre.onload = () => {
+                    const next = (active + 1) % 2;
+                    layers[next].style.backgroundImage = `url('${url}')`;
+                    layers[next].classList.add('is-on');
+                    layers[active].classList.remove('is-on');
+                    active = next;
+                };
+                pre.src = url;
+            };
+            swap();
+            clearInterval(heroTimer);
+            if (list.length > 1) heroTimer = setInterval(swap, 8000);
+        }
+
+        function updateHero() {
+            if (CONFIG.heroPhoto) return;                 // 手動指定が優先
+            const imgs = pool.filter((p) => !p.isVideo);
+            if (imgs.length) showHero(shuffle(imgs));
+        }
+
+        // ------------------------------------------------------
+        // ギャラリー
+        // ------------------------------------------------------
+        function placeholders() {
+            area.innerHTML = '';
+            const grid = document.createElement('div');
+            grid.className = 'placeholder-grid';
+            for (let i = 0; i < 6; i++) {
+                const tile = document.createElement('div');
+                tile.className = 'placeholder-tile';
+                tile.innerHTML = '<span class="cam">📷</span><span class="txt">Coming Soon</span>';
+                grid.appendChild(tile);
+            }
+            area.appendChild(grid);
+            const note = document.createElement('p');
+            note.className = 'thanks-message';
+            note.style.marginTop = '26px';
+            note.textContent = '当日の写真は、準備ができ次第こちらに掲載します';
+            area.appendChild(note);
+        }
+
+        function makeTile(photo, index, list) {
+            const tile = document.createElement('div');
+            tile.className = 'live-tile';
+
+            if (photo.isVideo) {
+                tile.classList.add('is-video');
+                const mark = document.createElement('span');
+                mark.className = 'mark';
+                mark.textContent = '▶';
+                tile.appendChild(mark);
+            } else {
+                const img = document.createElement('img');
+                img.alt = '結婚式の写真';
+                img.loading = 'lazy';
+                img.decoding = 'async';
+                let usedFull = photo.thumb === photo.full;
+                img.addEventListener('load', () => img.classList.add('is-loaded'));
+                img.addEventListener('error', () => {
+                    // サムネイルが無い・壊れている場合は原寸で再挑戦、それも駄目なら外す
+                    if (!usedFull) {
+                        usedFull = true;
+                        img.src = photo.full;
+                    } else {
+                        tile.remove();
+                    }
+                });
+                img.src = photo.thumb;
+                tile.appendChild(img);
+            }
+
+            if (photo.name) {
+                const by = document.createElement('span');
+                by.className = 'by';
+                by.textContent = photo.name + ' さん';
+                tile.appendChild(by);
+            }
+
+            tile.addEventListener('click', () => openLb(list, index));
+            return tile;
+        }
+
+        function renderGallery() {
+            if (!pool.length) {
+                placeholders();
+                return;
+            }
+            const picks = shuffle(pool).slice(0, CONFIG.galleryCount);
+            area.innerHTML = '';
+            const grid = document.createElement('div');
+            grid.className = 'live-grid';
+            picks.forEach((p, i) => grid.appendChild(makeTile(p, i, picks)));
+            area.appendChild(grid);
+            shown = pool.length;
+            newBtn.hidden = true;
+        }
+
+        function updateBar() {
+            bar.hidden = pool.length === 0;
+            countEl.textContent = pool.length ? pool.length + ' PHOTOS' : '';
+            shuffleBtn.hidden = pool.length <= CONFIG.galleryCount;
+        }
+
+        shuffleBtn.addEventListener('click', renderGallery);
+        newBtn.addEventListener('click', renderGallery);
+
+        // ------------------------------------------------------
+        // ライトボックス（写真・動画）
+        // ------------------------------------------------------
+        let lb, lbImg, lbVideo, lbCounter, lbBy;
+        let lbList = [];
+        let lbIndex = 0;
+
+        function buildLb() {
+            lb = document.createElement('div');
+            lb.className = 'lightbox';
+            lb.innerHTML =
+                '<button class="lightbox-btn lightbox-close" aria-label="閉じる">&times;</button>' +
+                '<button class="lightbox-btn lightbox-prev" aria-label="前の写真">&#8249;</button>' +
+                '<img alt="">' +
+                '<video controls playsinline hidden></video>' +
+                '<button class="lightbox-btn lightbox-next" aria-label="次の写真">&#8250;</button>' +
+                '<div class="lightbox-counter"></div>' +
+                '<div class="lightbox-by"></div>';
+            document.body.appendChild(lb);
+            lbImg = lb.querySelector('img');
+            lbVideo = lb.querySelector('video');
+            lbCounter = lb.querySelector('.lightbox-counter');
+            lbBy = lb.querySelector('.lightbox-by');
+
+            lb.querySelector('.lightbox-close').addEventListener('click', closeLb);
+            lb.querySelector('.lightbox-prev').addEventListener('click', () => showLb(lbIndex - 1));
+            lb.querySelector('.lightbox-next').addEventListener('click', () => showLb(lbIndex + 1));
+            lb.addEventListener('click', (e) => {
+                if (e.target === lb) closeLb();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (!lb.classList.contains('is-open')) return;
+                if (e.key === 'Escape') closeLb();
+                if (e.key === 'ArrowLeft') showLb(lbIndex - 1);
+                if (e.key === 'ArrowRight') showLb(lbIndex + 1);
+            });
+        }
+
+        function showLb(i) {
+            lbIndex = (i + lbList.length) % lbList.length;
+            const p = lbList[lbIndex];
+            lbVideo.pause();
+            if (p.isVideo) {
+                lbImg.hidden = true;
+                lbImg.removeAttribute('src');
+                lbVideo.hidden = false;
+                lbVideo.src = p.full;
+            } else {
+                lbVideo.hidden = true;
+                lbVideo.removeAttribute('src');
+                lbImg.hidden = false;
+                lbImg.onerror = () => {
+                    if (p.thumb !== p.full) lbImg.src = p.thumb;
+                };
+                lbImg.src = p.full;
+            }
+            lbCounter.textContent = (lbIndex + 1) + ' / ' + lbList.length;
+            lbBy.textContent = p.name ? p.name + ' さん' : '';
+        }
+
+        function openLb(list, i) {
+            if (!lb) buildLb();
+            lbList = list;
+            showLb(i);
+            lb.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLb() {
+            lbVideo.pause();
+            lb.classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+
+        // ------------------------------------------------------
+        // 読み込み
+        // ------------------------------------------------------
+        async function load(initial) {
+            try {
+                const res = await fetch(API + '/api/photos', { cache: 'no-store' });
+                if (!res.ok) throw new Error('bad status');
+                const data = await res.json();
+                const next = fromApi(data.photos || []);
+                const first = pool.length === 0;
+                pool = next;
+                updateHero();
+                updateBar();
+                if (initial || first) {
+                    renderGallery();
+                } else if (pool.length > shown) {
+                    newBtn.textContent = '新しい写真が ' + (pool.length - shown) + ' 枚 届きました';
+                    newBtn.hidden = false;
+                }
+            } catch (e) {
+                // 読み込めないときはプレースホルダーのまま（次の更新で再挑戦）
+                if (initial && !pool.length) placeholders();
+            }
+        }
+
+        if (CONFIG.heroPhoto) {
+            showHero([{ full: CONFIG.heroPhoto }]);
+        }
+
+        if (CONFIG.photos.length) {
+            // 手動指定モード
+            pool = fromConfig();
+            updateHero();
+            renderGallery();
+            updateBar();
+        } else if (API) {
+            placeholders();
+            load(true);
+            setInterval(() => load(false), REFRESH_MS);
+        } else {
+            placeholders();
+        }
 
         // ---- 写真共有 ----
         if (CONFIG.shareUrl) {

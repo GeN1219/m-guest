@@ -1,11 +1,12 @@
 name: Deploy to GitHub Pages
 
-# このブランチ（thanks = ありがとうサイト）を push すると公開が切り替わります。
-# main（ゲスト用サイト）に戻すには:
+# ありがとうサイト（式後公開用）。
+# 誤って公開が切り替わらないよう、push では何も起こりません。
+# 公開を切り替えるときだけ、手動で実行してください:
+#   gh workflow run deploy.yml --repo GeN1219/m-guest --ref thanks
+# ゲスト用サイトに戻すとき:
 #   gh workflow run deploy.yml --repo GeN1219/m-guest --ref main
 on:
-  push:
-    branches: [thanks]
   workflow_dispatch:
 
 permissions:

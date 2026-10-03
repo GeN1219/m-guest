@@ -7,28 +7,47 @@
 ## 公開を切り替える
 
 ```bash
-# 式後：ゲスト用サイト → ありがとうサイト（このブランチを push するだけ）
-git push origin thanks
+# 式後：ゲスト用サイト → ありがとうサイト
+gh workflow run deploy.yml --repo GeN1219/m-guest --ref thanks
 
 # いつでも：ゲスト用サイト（main）に戻す
 gh workflow run deploy.yml --repo GeN1219/m-guest --ref main
 ```
 
+このブランチへの push だけでは公開は切り替わりません（事故防止）。
+内容を直したあとは、上の切り替えコマンドをもう一度実行すると反映されます。
+
 切り替え後、`memory/` など元のページの URL には 404.html が
 「公開を終了しました」と案内し、このページへ誘導します。
 
-## 写真を載せる
+## 写真について（自動）
 
-`index.html` の末尾にある `CONFIG` を編集して push してください。
+当日ゲストが https://wedding-photos.gensen4631.workers.dev にアップロードした写真を
+**自動で読み込んで表示します**。手で貼り付ける作業は要りません。
 
-```js
-const CONFIG = {
-    heroPhoto: 'pic/wedding/hero.jpg',   // ヒーロー背景（null なら文字だけ）
-    photos: [                            // ギャラリー
-        'pic/wedding/001.jpg',
-    ],
-    shareUrl: 'https://wedding-photos.gensen4631.workers.dev',  // 設定済み
-};
+- ヒーロー背景：アップロード写真からランダムに選び、8秒ごとに切り替え
+- ギャラリー：ランダムに12枚。「シャッフル」で選び直し
+- 1分ごとに自動で見に行き、新着があれば「新しい写真が N 枚 届きました」と表示
+- 写真をタップで拡大（動画も再生可）。投稿者名も表示されます
+
+### 設定（index.html 末尾の CONFIG）
+
+| 項目 | 役割 |
+|---|---|
+| `photosApi` | 写真サイトのURL |
+| `photosSince` | **この日以降の写真だけ表示**。既定は `2026-11-15`。式より前のテスト投稿を出さないための設定 |
+| `galleryCount` | 一度に並べる枚数（既定12） |
+| `heroPhoto` | ヒーローを手動で固定したいときだけ指定 |
+| `photos` | 手動で写真を指定したいときだけ。指定すると自動読み込みは使いません |
+
+### ⚠ 写真サイト側の設定が必要
+
+写真一覧を外部サイトから読むため、Worker 側で CORS の許可が要ります。
+`GeN1219/wedding-photos` に変更済みなので、**デプロイしてください**。
+
+```bash
+cd ~/Desktop/個人作成/wedding-photos   # ローカルの作業フォルダ
+npx wrangler deploy
 ```
 
-写真は `pic/wedding/` を作って置きます（長辺1600px程度の JPEG に変換してから）。
+これを忘れると、写真が読み込めず「Coming Soon」のままになります。
