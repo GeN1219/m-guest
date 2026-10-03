@@ -1,0 +1,33 @@
+name: Deploy to GitHub Pages
+
+# このブランチ（thanks = ありがとうサイト）を push すると公開が切り替わります。
+# main（ゲスト用サイト）に戻すには:
+#   gh workflow run deploy.yml --repo GeN1219/m-guest --ref main
+on:
+  push:
+    branches: [thanks]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+      - id: deployment
+        uses: actions/deploy-pages@v4

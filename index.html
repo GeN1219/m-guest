@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You — G &amp; A</title>
+    <meta name="description" content="結婚式にご列席いただきありがとうございました">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#faf8f4">
+    <link rel="icon" href="icon-192.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon-192.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* ---- ありがとうサイト専用スタイル ---- */
+
+        /* ヒーロー（写真設定時は白文字に切り替え） */
+        .thanks-hero {
+            position: relative;
+            min-height: 100svh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 100px 24px 90px;
+            overflow: hidden;
+            background:
+                radial-gradient(ellipse 75% 55% at 50% -12%, var(--accent-faint), transparent 70%),
+                var(--bg);
+        }
+
+        .thanks-hero .bg {
+            position: absolute;
+            inset: 0;
+            background-position: center 35%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            display: none;
+        }
+
+        .thanks-hero .bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(20, 16, 12, 0.45), rgba(20, 16, 12, 0.22) 45%, rgba(20, 16, 12, 0.55));
+        }
+
+        .thanks-hero.has-photo .bg {
+            display: block;
+        }
+
+        .thanks-hero > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .thanks-title {
+            font-family: var(--font-latin);
+            font-style: italic;
+            font-size: clamp(52px, 11vw, 110px);
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            line-height: 1.15;
+            color: var(--ink);
+        }
+
+        .thanks-names {
+            margin-top: 22px;
+            font-size: clamp(15px, 2.4vw, 20px);
+            letter-spacing: 0.5em;
+            text-indent: 0.5em;
+            color: var(--ink-soft);
+        }
+
+        .thanks-names .amp {
+            font-family: var(--font-latin);
+            font-style: italic;
+            color: var(--accent);
+            margin: 0 0.2em;
+        }
+
+        .thanks-date {
+            margin-top: 34px;
+            font-family: var(--font-latin);
+            font-size: clamp(13px, 2.2vw, 17px);
+            letter-spacing: 0.34em;
+            text-indent: 0.34em;
+            color: var(--accent);
+        }
+
+        .thanks-hero.has-photo .thanks-title { color: #fff; text-shadow: 0 4px 30px rgba(0,0,0,0.4); }
+        .thanks-hero.has-photo .thanks-names { color: rgba(255,255,255,0.92); }
+        .thanks-hero.has-photo .thanks-date { color: var(--accent-soft); }
+        .thanks-hero.has-photo .eyebrow { color: rgba(255,255,255,0.85); }
+        .thanks-hero.has-photo .divider { background: rgba(255,255,255,0.8); }
+        .thanks-hero.has-photo .divider::after { background: #fff; }
+
+        /* ヒーローが写真のときのヘッダー白文字化 */
+        body.hero-photo .site-header:not(.is-solid) .brand,
+        body.hero-photo .site-header:not(.is-solid) .nav-links a {
+            color: rgba(255, 255, 255, 0.92);
+        }
+
+        body.hero-photo .site-header:not(.is-solid) .days-chip {
+            color: rgba(255, 255, 255, 0.9);
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        /* 本文セクション */
+        .thanks-section {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 80px 24px 10px;
+            text-align: center;
+        }
+
+        .thanks-section h2 {
+            font-size: clamp(20px, 3.2vw, 25px);
+            font-weight: 600;
+            letter-spacing: 0.26em;
+            text-indent: 0.26em;
+        }
+
+        .thanks-message {
+            margin-top: 34px;
+            font-size: 15px;
+            line-height: 2.6;
+            letter-spacing: 0.1em;
+            color: var(--ink-soft);
+        }
+
+        /* ギャラリー（写真が入るまではプレースホルダー表示） */
+        .thanks-gallery-wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 24px 10px;
+            text-align: center;
+        }
+
+        .placeholder-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 40px;
+        }
+
+        .placeholder-tile {
+            aspect-ratio: 4 / 3;
+            border: 1px dashed var(--accent-soft);
+            border-radius: 6px;
+            background: var(--card);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--ink-faint);
+        }
+
+        .placeholder-tile .cam {
+            font-size: 22px;
+            opacity: 0.6;
+        }
+
+        .placeholder-tile .txt {
+            font-family: var(--font-latin);
+            font-size: 10.5px;
+            letter-spacing: 0.3em;
+            text-indent: 0.3em;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 620px) {
+            .placeholder-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+        }
+
+        /* 写真共有のお願い（URL設定時のみ表示） */
+        .share-card {
+            margin-top: 40px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: var(--shadow-md);
+            padding: clamp(36px, 6vw, 56px);
+            position: relative;
+        }
+
+        .share-card::before {
+            content: '';
+            position: absolute;
+            inset: 10px;
+            border: 1px solid var(--accent-faint);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+
+        .share-text {
+            font-size: 14.5px;
+            line-height: 2.4;
+            letter-spacing: 0.1em;
+            color: var(--ink-soft);
+        }
+
+        .share-btn {
+            display: inline-block;
+            margin-top: 28px;
+            padding: 15px 52px;
+            border-radius: 999px;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            letter-spacing: 0.18em;
+            background: var(--ink);
+            color: #fff;
+            transition: background 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease;
+        }
+
+        .share-btn:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .thanks-close {
+            padding: 90px 24px 100px;
+            text-align: center;
+        }
+
+        .thanks-close .en {
+            font-family: var(--font-latin);
+            font-style: italic;
+            font-size: clamp(20px, 3.6vw, 28px);
+            color: var(--accent);
+            letter-spacing: 0.12em;
+        }
+
+        .thanks-close .jp {
+            margin-top: 18px;
+            font-size: 14px;
+            letter-spacing: 0.2em;
+            color: var(--ink-soft);
+        }
+    </style>
+</head>
+<body data-sw-path="sw.js">
+
+    <header class="site-header">
+        <a class="brand" href="index.html">G<span class="amp">&amp;</span>A</a>
+        <div class="days-chip"><span data-days></span>&nbsp;days</div>
+    </header>
+
+    <!-- ヒーロー（結婚式の写真が用意でき次第、下の CONFIG.heroPhoto を設定） -->
+    <section class="thanks-hero" id="hero">
+        <div class="bg" id="heroBg"></div>
+        <p class="eyebrow">With Gratitude</p>
+        <div class="divider"></div>
+        <h1 class="thanks-title">Thank You</h1>
+        <p class="thanks-names">玄<span class="amp">&amp;</span>彩乃</p>
+        <p class="thanks-date">2026.11.15 — JUST MARRIED</p>
+        <div class="scroll-cue">SCROLL</div>
+    </section>
+
+    <!-- 御礼のメッセージ -->
+    <section class="thanks-section reveal">
+        <p class="eyebrow">Message</p>
+        <div class="divider"></div>
+        <h2>ご列席の御礼</h2>
+        <p class="thanks-message">
+            先日は 私たちの結婚式に<br>
+            ご列席いただき 誠にありがとうございました<br>
+            皆様の温かいお祝いの言葉に包まれて<br>
+            かけがえのない一日を過ごすことができました<br>
+            <br>
+            未熟なふたりではございますが<br>
+            これからも力を合わせて<br>
+            明るい家庭を築いてまいります<br>
+            今後とも変わらぬお付き合いのほど<br>
+            よろしくお願い申し上げます
+        </p>
+    </section>
+
+    <!-- 当日の写真ギャラリー -->
+    <section class="thanks-gallery-wrap reveal">
+        <p class="eyebrow">Gallery</p>
+        <div class="divider"></div>
+        <h2>あの日の写真</h2>
+        <div id="galleryArea"></div>
+    </section>
+
+    <!-- 写真共有のお願い（CONFIG.shareUrl 設定時のみ表示） -->
+    <section class="thanks-section reveal" id="shareSection" hidden>
+        <p class="eyebrow">Share</p>
+        <div class="divider"></div>
+        <h2>写真の共有</h2>
+        <div class="share-card">
+            <p class="share-text">
+                当日 皆様が撮ってくださった写真も<br>
+                ぜひ ふたりに共有していただけると嬉しいです
+            </p>
+            <a class="share-btn" id="shareBtn" target="_blank" rel="noopener">写真をアップロードする</a>
+        </div>
+    </section>
+
+    <div class="thanks-close reveal">
+        <p class="en">Our story continues.</p>
+        <p class="jp">ふたりの物語は、これからも続きます。</p>
+    </div>
+
+    <footer class="site-footer">
+        <p class="brand">G<span class="amp">&amp;</span>A</p>
+        <p class="footer-since">SINCE 2017.11.15</p>
+        <p class="footer-days"><span data-days></span> days &amp; counting</p>
+    </footer>
+
+    <script src="assets/js/site.js"></script>
+    <script>
+        // =====================================================
+        // ありがとうサイト設定
+        // 結婚式の写真が用意できたらここを埋めるだけで反映されます
+        // =====================================================
+        const CONFIG = {
+            // ヒーロー背景写真（例: 'pic/wedding/hero.jpg'）。null なら上品なグラデーション表示
+            heroPhoto: null,
+            // ギャラリー写真のパスを追加（例: 'pic/wedding/001.jpg'）。空ならプレースホルダー表示
+            photos: [
+                // 'pic/wedding/001.jpg',
+                // 'pic/wedding/002.jpg',
+            ],
+            // 皆様からの写真共有URL（Googleフォト共有アルバム等）。null なら共有セクション非表示
+            shareUrl: 'https://wedding-photos.gensen4631.workers.dev',
+        };
+
+        // ---- ヒーロー写真 ----
+        if (CONFIG.heroPhoto) {
+            document.getElementById('heroBg').style.backgroundImage = `url('${CONFIG.heroPhoto}')`;
+            document.getElementById('hero').classList.add('has-photo');
+            document.body.classList.add('hero-photo');
+        }
+
+        // ---- ギャラリー ----
+        (() => {
+            const area = document.getElementById('galleryArea');
+            if (CONFIG.photos.length === 0) {
+                // 写真が来るまでのプレースホルダー
+                const grid = document.createElement('div');
+                grid.className = 'placeholder-grid';
+                for (let i = 0; i < 6; i++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'placeholder-tile';
+                    tile.innerHTML = '<span class="cam">📷</span><span class="txt">Coming Soon</span>';
+                    grid.appendChild(tile);
+                }
+                area.appendChild(grid);
+                const note = document.createElement('p');
+                note.className = 'thanks-message';
+                note.style.marginTop = '26px';
+                note.textContent = '当日の写真は、準備ができ次第こちらに掲載します';
+                area.appendChild(note);
+            } else {
+                // 写真ギャラリー（site.js のライトボックスが有効になります）
+                const grid = document.createElement('div');
+                grid.className = 'photo-grid';
+                grid.style.marginTop = '40px';
+                CONFIG.photos.forEach((src) => {
+                    const fig = document.createElement('figure');
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.alt = '結婚式の写真';
+                    img.loading = 'lazy';
+                    fig.appendChild(img);
+                    grid.appendChild(fig);
+                });
+                area.appendChild(grid);
+            }
+        })();
+
+        // ---- 写真共有 ----
+        if (CONFIG.shareUrl) {
+            document.getElementById('shareSection').hidden = false;
+            document.getElementById('shareBtn').href = CONFIG.shareUrl;
+        }
+    </script>
+</body>
+</html>
