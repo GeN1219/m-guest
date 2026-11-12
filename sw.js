@@ -38,6 +38,13 @@ self.addEventListener('activate', (event) => {
 
 // フェッチイベント：Network First 戦略
 self.addEventListener('fetch', (event) => {
+    // 動画は部分読み込み（Range）で取得されるため Service Worker を通さない。
+    // 通すと iPhone で再生できなかったり、数十MBの動画をキャッシュに抱え込んだりする
+    const url = new URL(event.request.url);
+    if (event.request.headers.has('range') || /\.(mp4|mov|webm)$/i.test(url.pathname)) {
+        return;
+    }
+
     event.respondWith(
         fetch(event.request)
             .then((response) => {
