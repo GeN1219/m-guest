@@ -44,6 +44,10 @@ self.addEventListener('fetch', (event) => {
     if (event.request.headers.has('range') || /\.(mp4|mov|webm)$/i.test(url.pathname)) {
         return;
     }
+    // メッセージ送信などの POST はキャッシュの対象外なので素通しにする
+    if (event.request.method !== 'GET') {
+        return;
+    }
 
     event.respondWith(
         fetch(event.request)

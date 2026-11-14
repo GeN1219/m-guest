@@ -475,6 +475,96 @@
             box-shadow: var(--shadow-md);
         }
 
+        /* メッセージ（CONFIG.messageApi 設定時のみ表示） */
+        .message-form {
+            margin-top: 26px;
+            text-align: left;
+            position: relative;
+            z-index: 1;
+        }
+
+        .message-form label {
+            display: block;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            letter-spacing: 0.1em;
+            color: var(--ink);
+            margin: 18px 0 8px;
+        }
+
+        .message-form input,
+        .message-form textarea {
+            display: block;
+            width: 100%;
+            font-family: var(--font-sans);
+            font-size: 16px;
+            color: var(--ink);
+            background: var(--bg);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px 14px;
+            transition: border-color 0.25s ease;
+        }
+
+        .message-form textarea {
+            min-height: 150px;
+            line-height: 1.9;
+            resize: vertical;
+        }
+
+        .message-form input:focus,
+        .message-form textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* ボット対策の隠し欄（人には見えない） */
+        .message-form .hp {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+
+        .message-form .share-btn {
+            display: block;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+        }
+
+        .message-form .share-btn:disabled {
+            background: var(--ink-faint);
+            cursor: default;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .message-error {
+            margin-top: 14px;
+            font-size: 13px;
+            color: var(--rose);
+            text-align: center;
+        }
+
+        .message-done {
+            position: relative;
+            z-index: 1;
+            margin-top: 18px;
+            font-size: 14.5px;
+            line-height: 2.4;
+            letter-spacing: 0.1em;
+            color: var(--ink-soft);
+        }
+
+        .message-done .en {
+            font-family: var(--font-latin);
+            font-style: italic;
+            font-size: 26px;
+            color: var(--accent);
+        }
+
         .thanks-close {
             padding: 90px 24px 100px;
             text-align: center;
@@ -583,6 +673,38 @@
         </div>
     </section>
 
+    <!-- メッセージ（CONFIG.messageApi 設定時のみ表示。送信内容は LINE に通知される） -->
+    <section class="thanks-section reveal" id="messageSection" hidden>
+        <p class="eyebrow">Message</p>
+        <div class="divider"></div>
+        <h2>メッセージはこちら</h2>
+        <div class="share-card">
+            <p class="share-text">
+                ふたりへのメッセージを<br>
+                お気軽にお寄せください
+            </p>
+            <form class="message-form" id="messageForm">
+                <label for="msgName">お名前</label>
+                <input type="text" id="msgName" maxlength="50" autocomplete="name" required>
+                <label for="msgBody">メッセージ</label>
+                <textarea id="msgBody" maxlength="1000" required></textarea>
+                <div class="hp" aria-hidden="true">
+                    <label for="msgWebsite">ウェブサイト</label>
+                    <input type="text" id="msgWebsite" tabindex="-1" autocomplete="off">
+                </div>
+                <button type="submit" class="share-btn" id="msgSubmit" style="margin-top: 26px">送信する</button>
+                <p class="message-error" id="msgError" hidden></p>
+            </form>
+            <div class="message-done" id="msgDone" hidden>
+                <p class="en">Thank you!</p>
+                <p>
+                    メッセージありがとうございます<br>
+                    ふたりで大切に読ませていただきます
+                </p>
+            </div>
+        </div>
+    </section>
+
     <div class="thanks-close reveal">
         <p class="en">Our story continues.</p>
         <p class="jp">ふたりの物語は、これからも続きます。</p>
@@ -613,6 +735,9 @@
             photos: [],
             // 「写真をアップロードする」ボタンのリンク先
             shareUrl: 'https://wedding-photos.gensen4631.workers.dev',
+            // 「メッセージはこちら」の送信先（Google Apps Script のウェブアプリURL）
+            // 空のあいだはメッセージ欄ごと表示しない
+            messageApi: '',
         };
 
         const API = (CONFIG.photosApi || '').replace(/\/+$/, '');
@@ -944,6 +1069,47 @@
         if (CONFIG.shareUrl) {
             document.getElementById('shareSection').hidden = false;
             document.getElementById('shareBtn').href = CONFIG.shareUrl;
+        }
+
+        // ------------------------------------------------------
+        // メッセージ欄（Google Apps Script → スプレッドシート・LINE・メール）
+        // ------------------------------------------------------
+        if (CONFIG.messageApi) {
+            document.getElementById('messageSection').hidden = false;
+            const form = document.getElementById('messageForm');
+            const btn = document.getElementById('msgSubmit');
+            const err = document.getElementById('msgError');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                err.hidden = true;
+                if (navigator.onLine === false) {
+                    err.textContent = 'オフラインのようです。通信環境をご確認のうえ再度お試しください。';
+                    err.hidden = false;
+                    return;
+                }
+                btn.disabled = true;
+                btn.textContent = '送信中…';
+
+                // GAS はレスポンスを読めない(no-cors)ので、送信は投げっぱなしにして
+                // すぐ完了表示にする（出欠フォームと同じ方式）
+                fetch(CONFIG.messageApi, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    keepalive: true,
+                    body: JSON.stringify({
+                        type: 'message',
+                        name: document.getElementById('msgName').value.trim(),
+                        message: document.getElementById('msgBody').value.trim(),
+                        website: document.getElementById('msgWebsite').value,
+                    }),
+                }).catch((e2) => console.error('送信エラー:', e2));
+
+                setTimeout(() => {
+                    form.hidden = true;
+                    document.getElementById('msgDone').hidden = false;
+                }, 600);
+            });
         }
     </script>
 </body>
