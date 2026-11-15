@@ -360,24 +360,6 @@
             object-fit: contain;
         }
 
-        .slide-by {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 2;
-            padding: 30px 16px 12px;
-            text-align: right;
-            font-size: 12px;
-            letter-spacing: 0.14em;
-            color: rgba(255, 255, 255, 0.9);
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
-            pointer-events: none;
-        }
-
-        .slide-by:empty {
-            display: none;
-        }
 
         @media (max-width: 620px) {
             .slideshow {
@@ -757,7 +739,6 @@
         <div class="slideshow" id="slideshow">
             <div class="slide"><div class="slide-bg"></div><img alt=""></div>
             <div class="slide"><div class="slide-bg"></div><img alt=""></div>
-            <p class="slide-by" id="slideBy"></p>
         </div>
     </section>
 
@@ -909,7 +890,6 @@
         const slideSection = document.getElementById('slideshowSection');
         const slideBox = document.getElementById('slideshow');
         const slides = slideBox.querySelectorAll('.slide');
-        const slideBy = document.getElementById('slideBy');
         let slideList = [];
         let slideIdx = 0;
         let slideActive = -1;
@@ -938,7 +918,6 @@
                 target.classList.add('is-on');
                 if (slideActive !== -1) slides[slideActive].classList.remove('is-on');
                 slideActive = (slideActive + 1) % 2;
-                slideBy.textContent = p.name ? p.name + ' さん' : '';
             };
             pre.src = p.full;
         }
