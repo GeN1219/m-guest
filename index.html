@@ -44,16 +44,30 @@
             position: fixed;
             inset: 0;
             z-index: -1;
-            display: grid;
-            grid-template-rows: 1fr 1fr;
             pointer-events: none;
         }
 
         .page-backdrop span {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 56%;
             background-size: cover;
             background-repeat: no-repeat;
             opacity: 0.2;
         }
+
+        .page-backdrop span:first-child {
+            top: 0;
+        }
+
+        /* 下の写真を上の写真に少し重ね、境目をグラデーションでなじませる */
+        .page-backdrop span:last-child {
+            bottom: 0;
+            -webkit-mask-image: linear-gradient(transparent, #000 22%);
+            mask-image: linear-gradient(transparent, #000 22%);
+        }
+
 
         /* 背景の写真が透けるよう、フッターの帯も半透明にする */
         .site-footer {
@@ -281,7 +295,7 @@
             font-family: var(--font-latin);
             font-size: 12px;
             letter-spacing: 0.2em;
-            color: var(--ink-faint);
+            color: var(--ink-soft);
         }
 
         /* 1件だけ開いたときは前後ボタンと枚数表示を出さない */
@@ -399,7 +413,7 @@
             margin-top: 14px;
             font-size: 12px;
             letter-spacing: 0.12em;
-            color: var(--ink-faint);
+            color: var(--ink-soft);
         }
 
         .gallery-bar {
