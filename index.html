@@ -16,7 +16,7 @@
     <style>
         /* ---- ありがとうサイト専用スタイル ---- */
 
-        /* ヒーロー（写真設定時は白文字に切り替え） */
+        /* ヒーロー：文字の下に、固定の3枚をプリント写真のように並べる */
         .thanks-hero {
             position: relative;
             min-height: 100svh;
@@ -25,36 +25,69 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 100px 24px 90px;
+            padding: 96px 20px 120px;
             overflow: hidden;
             background:
                 radial-gradient(ellipse 75% 55% at 50% -12%, var(--accent-faint), transparent 70%),
                 var(--bg);
         }
 
-        .thanks-hero .bg {
-            position: absolute;
-            inset: 0;
-            background-position: center 35%;
-            background-size: cover;
-            background-repeat: no-repeat;
-            display: none;
-        }
-
-        .thanks-hero .bg::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(rgba(20, 16, 12, 0.45), rgba(20, 16, 12, 0.22) 45%, rgba(20, 16, 12, 0.55));
-        }
-
-        .thanks-hero.has-photo .bg {
-            display: block;
-        }
-
         .thanks-hero > * {
             position: relative;
             z-index: 1;
+        }
+
+        .hero-prints {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: clamp(36px, 6vw, 56px);
+        }
+
+        .hero-print {
+            position: relative;
+            margin: 0;
+            border: none;
+            background: #fff;
+            padding: clamp(5px, 1vw, 9px);
+            border-radius: 3px;
+            box-shadow: 0 14px 34px rgba(60, 50, 35, 0.18);
+            cursor: zoom-in;
+            width: clamp(108px, 26vw, 240px);
+            animation: printIn 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .hero-print img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            object-fit: cover;
+        }
+
+        .hero-print:nth-child(1) {
+            --tilt: -6deg;
+            transform: rotate(var(--tilt)) translateY(12px);
+            margin-right: calc(-1 * clamp(18px, 3vw, 30px));
+            animation-delay: 0.15s;
+        }
+
+        .hero-print:nth-child(2) {
+            --tilt: 0deg;
+            width: clamp(140px, 34vw, 300px);
+            z-index: 2;
+            animation-delay: 0.3s;
+        }
+
+        .hero-print:nth-child(3) {
+            --tilt: 5deg;
+            transform: rotate(var(--tilt)) translateY(16px);
+            margin-left: calc(-1 * clamp(18px, 3vw, 30px));
+            animation-delay: 0.45s;
+        }
+
+        @keyframes printIn {
+            from { opacity: 0; translate: 0 18px; }
+            to { opacity: 1; translate: 0 0; }
         }
 
         .thanks-title {
@@ -91,25 +124,6 @@
             color: var(--accent);
         }
 
-        .thanks-hero.has-photo .thanks-title { color: #fff; text-shadow: 0 4px 30px rgba(0,0,0,0.4); }
-        .thanks-hero.has-photo .thanks-names { color: rgba(255,255,255,0.92); }
-        .thanks-hero.has-photo .thanks-date { color: var(--accent-soft); }
-        .thanks-hero.has-photo .eyebrow { color: rgba(255,255,255,0.85); }
-        .thanks-hero.has-photo .divider { background: rgba(255,255,255,0.8); }
-        .thanks-hero.has-photo .divider::after { background: #fff; }
-
-        /* ヒーローが写真のときのヘッダー白文字化 */
-        body.hero-photo .site-header:not(.is-solid) .brand,
-        body.hero-photo .site-header:not(.is-solid) .nav-links a {
-            color: rgba(255, 255, 255, 0.92);
-        }
-
-        body.hero-photo .site-header:not(.is-solid) .days-chip {
-            color: rgba(255, 255, 255, 0.9);
-            border-color: rgba(255, 255, 255, 0.4);
-            background: rgba(0, 0, 0, 0.15);
-        }
-
         /* 本文セクション */
         .thanks-section {
             max-width: 760px;
@@ -136,9 +150,32 @@
         /* 当日のムービー（クリックでライトボックス再生） */
         .movie-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 18px;
             margin-top: 40px;
+        }
+
+        /* 準備中のムービー（タップできない） */
+        .movie-card.is-soon {
+            cursor: default;
+        }
+
+        .movie-soon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                radial-gradient(ellipse 80% 70% at 50% 40%, var(--card), var(--accent-faint));
+            border: 1px dashed var(--accent-soft);
+            box-shadow: none;
+        }
+
+        .movie-soon span {
+            font-family: var(--font-latin);
+            font-style: italic;
+            font-size: clamp(20px, 2.6vw, 24px);
+            letter-spacing: 0.08em;
+            color: var(--accent);
         }
 
         .movie-card {
@@ -277,19 +314,70 @@
             }
         }
 
-        /* ヒーロー背景のクロスフェード */
-        .thanks-hero .bg .layer {
-            position: absolute;
-            inset: 0;
-            background-position: center 35%;
-            background-size: cover;
-            background-repeat: no-repeat;
-            opacity: 0;
-            transition: opacity 1.8s ease;
+        /* 皆様から共有いただいた画像（枠内のスライドショー） */
+        .slideshow {
+            position: relative;
+            max-width: 760px;
+            margin: 40px auto 0;
+            aspect-ratio: 4 / 3;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #1c1813;
+            box-shadow: var(--shadow-md);
+            cursor: zoom-in;
         }
 
-        .thanks-hero .bg .layer.is-on {
+        .slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 1.4s ease;
+        }
+
+        .slide.is-on {
             opacity: 1;
+        }
+
+        /* 縦横どちらの写真も切らずに見せ、余白は同じ写真をぼかして埋める */
+        .slide-bg {
+            position: absolute;
+            inset: -40px;
+            background-size: cover;
+            background-position: center;
+            filter: blur(26px) brightness(0.55);
+        }
+
+        .slide img {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .slide-by {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2;
+            padding: 30px 16px 12px;
+            text-align: right;
+            font-size: 12px;
+            letter-spacing: 0.14em;
+            color: rgba(255, 255, 255, 0.9);
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
+            pointer-events: none;
+        }
+
+        .slide-by:empty {
+            display: none;
+        }
+
+        @media (max-width: 620px) {
+            .slideshow {
+                aspect-ratio: 4 / 5;
+                border-radius: 10px;
+            }
         }
 
         /* アップロードされた写真のギャラリー */
@@ -593,14 +681,18 @@
         <div class="days-chip"><span data-days></span>&nbsp;days</div>
     </header>
 
-    <!-- ヒーロー（結婚式の写真が用意でき次第、下の CONFIG.heroPhoto を設定） -->
+    <!-- ヒーロー（当日の写真から選んだ固定の3枚。差し替えは images/hero-*.jpg と object-position） -->
     <section class="thanks-hero" id="hero">
-        <div class="bg" id="heroBg"></div>
         <p class="eyebrow">With Gratitude</p>
         <div class="divider"></div>
         <h1 class="thanks-title">Thank You</h1>
         <p class="thanks-names">玄<span class="amp">&amp;</span>彩乃</p>
         <p class="thanks-date">2026.11.15 — JUST MARRIED</p>
+        <div class="hero-prints">
+            <button class="hero-print" type="button"><img src="images/hero-left.jpg" alt="ケーキ入刀" style="object-position: 50% 85%"></button>
+            <button class="hero-print" type="button"><img src="images/hero-center.jpg" alt="ふたりの入場" style="object-position: 57% 50%"></button>
+            <button class="hero-print" type="button"><img src="images/hero-right.jpg" alt="メイン席のふたり" style="object-position: 30% 50%"></button>
+        </div>
         <div class="scroll-cue">SCROLL</div>
     </section>
 
@@ -643,6 +735,23 @@
                 </div>
                 <p class="movie-title">プロフィールムービー<span class="movie-time">4:19</span></p>
             </button>
+            <!-- 動画ができたら button.movie-card（data-movie 付き）に差し替える -->
+            <div class="movie-card is-soon" aria-disabled="true">
+                <div class="movie-thumb movie-soon"><span>Coming soon</span></div>
+                <p class="movie-title">エンディングムービー<span class="movie-time">準備中</span></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 皆様から共有いただいた画像（写真アップロードサイトの写真を枠内でスライドショー） -->
+    <section class="thanks-gallery-wrap reveal" id="slideshowSection" hidden>
+        <p class="eyebrow">Slideshow</p>
+        <div class="divider"></div>
+        <h2>皆様から共有いただいた画像</h2>
+        <div class="slideshow" id="slideshow">
+            <div class="slide"><div class="slide-bg"></div><img alt=""></div>
+            <div class="slide"><div class="slide-bg"></div><img alt=""></div>
+            <p class="slide-by" id="slideBy"></p>
         </div>
     </section>
 
@@ -731,8 +840,9 @@
             // 一度に並べる枚数。毎回この中からランダムに選ばれます
             galleryCount: 12,
             // 手動で写真を指定したいときだけ使用（指定すると自動読み込みより優先）
-            heroPhoto: null,
             photos: [],
+            // 「皆様から共有いただいた画像」のスライドショーの切り替え間隔（ミリ秒）
+            slideMs: 5000,
             // 「写真をアップロードする」ボタンのリンク先
             shareUrl: 'https://wedding-photos.gensen4631.workers.dev',
             // 「メッセージはこちら」の送信先（Google Apps Script のウェブアプリURL）
@@ -746,8 +856,6 @@
         const SINCE = PREVIEW ? '' : (CONFIG.photosSince || '').replace(/\D/g, '');
         const REFRESH_MS = 60000;
 
-        const hero = document.getElementById('hero');
-        const heroBg = document.getElementById('heroBg');
         const area = document.getElementById('galleryArea');
         const bar = document.getElementById('galleryBar');
         const countEl = document.getElementById('galleryCount');
@@ -789,49 +897,66 @@
             CONFIG.photos.map((src) => ({ full: src, thumb: src, name: '', isVideo: false }));
 
         // ------------------------------------------------------
-        // ヒーロー背景（複数あるときは8秒ごとにゆっくり切り替え）
+        // 皆様から共有いただいた画像（枠内のスライドショー）
+        // 一周するたびに最新の写真で並べ直すので、新着も自然に混ざる
         // ------------------------------------------------------
-        const layers = [];
-        let heroTimer = null;
+        const slideSection = document.getElementById('slideshowSection');
+        const slideBox = document.getElementById('slideshow');
+        const slides = slideBox.querySelectorAll('.slide');
+        const slideBy = document.getElementById('slideBy');
+        let slideList = [];
+        let slideIdx = 0;
+        let slideActive = -1;
+        let slideBusy = false;
+        let slideVisible = true;
+        let slideTimer = null;
 
-        function showHero(list) {
-            if (!list.length) return;
-            if (!layers.length) {
-                for (let i = 0; i < 2; i++) {
-                    const l = document.createElement('div');
-                    l.className = 'layer';
-                    heroBg.appendChild(l);
-                    layers.push(l);
-                }
-            }
-            hero.classList.add('has-photo');
-            document.body.classList.add('hero-photo');
-
-            let i = 0;
-            let active = 0;
-            const swap = () => {
-                const url = list[i % list.length].full;
-                i++;
-                const pre = new Image();
-                pre.onload = () => {
-                    const next = (active + 1) % 2;
-                    layers[next].style.backgroundImage = `url('${url}')`;
-                    layers[next].classList.add('is-on');
-                    layers[active].classList.remove('is-on');
-                    active = next;
-                };
-                pre.src = url;
-            };
-            swap();
-            clearInterval(heroTimer);
-            if (list.length > 1) heroTimer = setInterval(swap, 8000);
-        }
-
-        function updateHero() {
-            if (CONFIG.heroPhoto) return;                 // 手動指定が優先
+        function nextSlide() {
+            // 画面外のときは通信量を抑えるため止めておく（最初の1枚は必ず出す）
+            if (slideBusy || (!slideVisible && slideActive !== -1)) return;
             const imgs = pool.filter((p) => !p.isVideo);
-            if (imgs.length) showHero(shuffle(imgs));
+            if (!imgs.length) return;
+            if (slideIdx >= slideList.length) {
+                slideList = shuffle(imgs);
+                slideIdx = 0;
+            }
+            const p = slideList[slideIdx++];
+            const target = slides[(slideActive + 1) % 2];
+            slideBusy = true;
+            const pre = new Image();
+            pre.onload = pre.onerror = () => {
+                slideBusy = false;
+                if (!pre.naturalWidth) return;          // 読めない写真は飛ばす
+                target.querySelector('img').src = p.full;
+                target.querySelector('.slide-bg').style.backgroundImage = `url('${p.full}')`;
+                target.classList.add('is-on');
+                if (slideActive !== -1) slides[slideActive].classList.remove('is-on');
+                slideActive = (slideActive + 1) % 2;
+                slideBy.textContent = p.name ? p.name + ' さん' : '';
+            };
+            pre.src = p.full;
         }
+
+        function updateSlideshow() {
+            if (!pool.some((p) => !p.isVideo)) return;
+            slideSection.hidden = false;
+            if (!slideTimer) {
+                nextSlide();
+                slideTimer = setInterval(nextSlide, CONFIG.slideMs);
+            }
+        }
+
+        if ('IntersectionObserver' in window) {
+            new IntersectionObserver((entries) => {
+                slideVisible = entries[0].isIntersecting;
+            }).observe(slideBox);
+        }
+
+        // 枠をタップすると、いま表示中の写真から拡大表示
+        slideBox.addEventListener('click', () => {
+            if (!slideList.length) return;
+            openLb(slideList, Math.max(0, slideIdx - 1));
+        });
 
         // ------------------------------------------------------
         // ギャラリー
@@ -1000,8 +1125,16 @@
             document.body.style.overflow = '';
         }
 
+        // ヒーローの3枚：タップで拡大
+        const heroPrints = [...document.querySelectorAll('.hero-print img')].map((img) => ({
+            full: img.getAttribute('src'), thumb: img.getAttribute('src'), name: '', isVideo: false,
+        }));
+        document.querySelectorAll('.hero-print').forEach((btn, i) => {
+            btn.addEventListener('click', () => openLb(heroPrints, i));
+        });
+
         // 当日のムービー：カードをタップするとライトボックスで再生
-        document.querySelectorAll('.movie-card').forEach((card) => {
+        document.querySelectorAll('button.movie-card[data-movie]').forEach((card) => {
             card.addEventListener('click', () => {
                 openLb([{
                     full: card.dataset.movie,
@@ -1025,7 +1158,7 @@
                 const next = fromApi(data.photos || []);
                 const first = pool.length === 0;
                 pool = next;
-                updateHero();
+                updateSlideshow();
                 updateBar();
                 if (initial || first) {
                     renderGallery();
@@ -1047,14 +1180,10 @@
             bar.insertAdjacentElement('afterend', note);
         }
 
-        if (CONFIG.heroPhoto) {
-            showHero([{ full: CONFIG.heroPhoto }]);
-        }
-
         if (CONFIG.photos.length) {
             // 手動指定モード
             pool = fromConfig();
-            updateHero();
+            updateSlideshow();
             renderGallery();
             updateBar();
         } else if (API) {
