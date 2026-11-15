@@ -37,11 +37,16 @@
             z-index: 1;
         }
 
+        /* SCROLL表示は画面下部に固定（上の共通ルールより優先させる） */
+        .thanks-hero .scroll-cue {
+            position: absolute;
+        }
+
         .hero-prints {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: clamp(36px, 6vw, 56px);
+            margin-top: clamp(32px, 5vh, 52px);
         }
 
         .hero-print {
@@ -53,7 +58,8 @@
             border-radius: 3px;
             box-shadow: 0 14px 34px rgba(60, 50, 35, 0.18);
             cursor: zoom-in;
-            width: clamp(108px, 26vw, 240px);
+            /* 画面の幅と高さの小さい方に合わせる（PCの低い画面でもはみ出しにくく） */
+            width: clamp(108px, min(26vw, 22vh), 220px);
             animation: printIn 1s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
@@ -73,7 +79,7 @@
 
         .hero-print:nth-child(2) {
             --tilt: 0deg;
-            width: clamp(140px, 34vw, 300px);
+            width: clamp(140px, min(34vw, 29vh), 270px);
             z-index: 2;
             animation-delay: 0.3s;
         }
