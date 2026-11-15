@@ -69,9 +69,11 @@
         }
 
 
-        /* 背景の写真が透けるよう、フッターの帯も半透明にする */
-        .site-footer {
-            background: rgba(242, 237, 228, 0.55);
+        /* 当日のムービー以降は背景写真なし（無地）。上端だけ写真からなめらかにつなぐ */
+        .plain-area {
+            position: relative;
+            /* 先頭の余白（見出しの上）で写真から無地へ切り替え、以降は無地 */
+            background: linear-gradient(transparent 0, var(--bg) 70px);
         }
 
         /* 御礼の文章は読みやすさ優先で白地に載せる */
@@ -758,6 +760,9 @@
         </p>
     </section>
 
+    <!-- ここから下は背景写真なし -->
+    <div class="plain-area">
+
     <!-- 当日のムービー（タップでライトボックス再生） -->
     <section class="thanks-section reveal" id="movies">
         <p class="eyebrow">Movie</p>
@@ -861,6 +866,8 @@
     <div class="thanks-close reveal">
         <p class="en">Our story continues.</p>
         <p class="jp">ふたりの物語は、これからも続きます。</p>
+    </div>
+
     </div>
 
     <footer class="site-footer">
