@@ -42,6 +42,29 @@
             position: absolute;
         }
 
+        /* 背景にうっすら敷く2枚（チャペル）。左右に並べ、上下は背景色へ溶かす */
+        .thanks-hero .hero-backdrop {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            pointer-events: none;
+        }
+
+        .hero-backdrop span {
+            background-size: cover;
+            background-repeat: no-repeat;
+            opacity: 0.2;
+        }
+
+        .hero-backdrop::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(var(--bg) 0%, transparent 22%, transparent 70%, var(--bg) 100%);
+        }
+
         .hero-prints {
             display: flex;
             justify-content: center;
@@ -678,6 +701,10 @@
 
     <!-- ヒーロー（当日の写真から選んだ固定の3枚。差し替えは images/hero-*.jpg と object-position） -->
     <section class="thanks-hero" id="hero">
+        <div class="hero-backdrop" aria-hidden="true">
+            <span style="background-image: url('images/bg-left.jpg'); background-position: 50% 40%"></span>
+            <span style="background-image: url('images/bg-right.jpg'); background-position: 60% 45%"></span>
+        </div>
         <p class="eyebrow">With Gratitude</p>
         <div class="divider"></div>
         <h1 class="thanks-title">Thank You</h1>
