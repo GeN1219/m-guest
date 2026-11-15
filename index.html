@@ -27,9 +27,6 @@
             text-align: center;
             padding: 96px 20px 120px;
             overflow: hidden;
-            background:
-                radial-gradient(ellipse 75% 55% at 50% -12%, var(--accent-faint), transparent 70%),
-                var(--bg);
         }
 
         .thanks-hero > * {
@@ -42,27 +39,33 @@
             position: absolute;
         }
 
-        /* 背景にうっすら敷く2枚（チャペル）。左右に並べ、上下は背景色へ溶かす */
-        .thanks-hero .hero-backdrop {
-            position: absolute;
+        /* ページ全体の背景にうっすら敷く2枚（チャペル）。画面に固定し、上下に並べる */
+        .page-backdrop {
+            position: fixed;
             inset: 0;
-            z-index: 0;
+            z-index: -1;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
             pointer-events: none;
         }
 
-        .hero-backdrop span {
+        .page-backdrop span {
             background-size: cover;
             background-repeat: no-repeat;
             opacity: 0.2;
         }
 
-        .hero-backdrop::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(var(--bg) 0%, transparent 22%, transparent 70%, var(--bg) 100%);
+        /* 背景の写真が透けるよう、フッターの帯も半透明にする */
+        .site-footer {
+            background: rgba(242, 237, 228, 0.55);
+        }
+
+        /* 御礼の文章は読みやすさ優先で白地に載せる */
+        .thanks-message {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            padding: clamp(26px, 5vw, 40px) 18px;
         }
 
         .hero-prints {
@@ -694,6 +697,12 @@
 </head>
 <body data-sw-path="sw.js">
 
+    <!-- ページ全体の背景（上：ステンドグラス、下：花越しの後ろ姿） -->
+    <div class="page-backdrop" aria-hidden="true">
+        <span style="background-image: url('images/bg-left.jpg'); background-position: 50% 45%"></span>
+        <span style="background-image: url('images/bg-right.jpg'); background-position: 50% 45%"></span>
+    </div>
+
     <header class="site-header">
         <a class="brand" href="index.html">G<span class="amp">&amp;</span>A</a>
         <div class="days-chip"><span data-days></span>&nbsp;days</div>
@@ -701,10 +710,6 @@
 
     <!-- ヒーロー（当日の写真から選んだ固定の3枚。差し替えは images/hero-*.jpg と object-position） -->
     <section class="thanks-hero" id="hero">
-        <div class="hero-backdrop" aria-hidden="true">
-            <span style="background-image: url('images/bg-left.jpg'); background-position: 50% 40%"></span>
-            <span style="background-image: url('images/bg-right.jpg'); background-position: 60% 45%"></span>
-        </div>
         <p class="eyebrow">With Gratitude</p>
         <div class="divider"></div>
         <h1 class="thanks-title">Thank You</h1>
@@ -770,6 +775,7 @@
         <p class="eyebrow">Slideshow</p>
         <div class="divider"></div>
         <h2>皆様から共有いただいた画像</h2>
+        <p class="gallery-note">1枚ずつランダムにスライドショー</p>
         <div class="slideshow" id="slideshow">
             <div class="slide"><div class="slide-bg"></div><img alt=""></div>
             <div class="slide"><div class="slide-bg"></div><img alt=""></div>
