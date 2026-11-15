@@ -369,6 +369,13 @@
         }
 
         /* アップロードされた写真のギャラリー */
+        .gallery-note {
+            margin-top: 14px;
+            font-size: 12px;
+            letter-spacing: 0.12em;
+            color: var(--ink-faint);
+        }
+
         .gallery-bar {
             margin-top: 30px;
             display: flex;
@@ -747,6 +754,7 @@
         <p class="eyebrow">Gallery</p>
         <div class="divider"></div>
         <h2>あの日の写真</h2>
+        <p class="gallery-note" id="galleryNote">12枚をランダムに表示</p>
         <div class="gallery-bar" id="galleryBar" hidden>
             <span class="gallery-count" id="galleryCount"></span>
             <button class="gallery-btn" id="shuffleBtn" hidden>シャッフル</button>
@@ -1178,6 +1186,8 @@
         } else {
             placeholders();
         }
+
+        document.getElementById('galleryNote').textContent = CONFIG.galleryCount + '枚をランダムに表示';
 
         // ---- 写真共有 ----
         if (CONFIG.shareUrl) {
