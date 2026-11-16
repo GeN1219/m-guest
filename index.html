@@ -203,29 +203,6 @@
             margin-top: 40px;
         }
 
-        /* 準備中のムービー（タップできない） */
-        .movie-card.is-soon {
-            cursor: default;
-        }
-
-        .movie-soon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background:
-                radial-gradient(ellipse 80% 70% at 50% 40%, var(--card), var(--accent-faint));
-            border: 1px dashed var(--accent-soft);
-            box-shadow: none;
-        }
-
-        .movie-soon span {
-            font-family: var(--font-latin);
-            font-style: italic;
-            font-size: clamp(20px, 2.6vw, 24px);
-            letter-spacing: 0.08em;
-            color: var(--accent);
-        }
-
         .movie-card {
             display: block;
             width: 100%;
@@ -783,11 +760,13 @@
                 </div>
                 <p class="movie-title">プロフィールムービー<span class="movie-time">4:19</span></p>
             </button>
-            <!-- 動画ができたら button.movie-card（data-movie 付き）に差し替える -->
-            <div class="movie-card is-soon" aria-disabled="true">
-                <div class="movie-thumb movie-soon"><span>Coming soon</span></div>
-                <p class="movie-title">エンディングムービー<span class="movie-time">準備中</span></p>
-            </div>
+            <button class="movie-card" type="button" data-movie="movies/ending.mp4">
+                <div class="movie-thumb">
+                    <img src="movies/ending.jpg" alt="エンディングムービー" loading="lazy">
+                    <span class="movie-play" aria-hidden="true"></span>
+                </div>
+                <p class="movie-title">エンディングムービー<span class="movie-time">4:24</span></p>
+            </button>
         </div>
     </section>
 
